@@ -7,14 +7,14 @@ data_path = "./data"
 file_per_category = 20
 
 try:
-    categroy_list = [
+    category_list = [
         folder for folder in os.listdir(dataset_path) if os.path.isdir(os.path.join(dataset_path, folder))
     ]
 except FileNotFoundError:
     print(f"Dataset path '{dataset_path}' does not exist.")
     exit()
     
-for category in categroy_list:
+for category in category_list:
     category_path = os.path.join(dataset_path, category)
     print(f"Processing {category} category...")
     
