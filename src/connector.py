@@ -31,17 +31,19 @@ class Connector:
             self.connection.close()
             print("Connection closed")
             
-    def get_applicant_profile(self, applicant_id):
+    def get_applicant_profile(self, detail_id):
         if not self.connection or not self.connection.is_connected():
             print("No active connection")
             return None
         try:
-            query = "SELECT * FROM ApplicantProfile WHERE applicant_id = %s"
-            self.cursor.execute(query, (applicant_id,))
+            query = "SELECT * FROM ApplicantProfile ap, ApplicantDetails ad WHERE ap.applicant_id = ad.applicant_id AND ad.detail_id = %s"
+            self.cursor.execute(query, (detail_id,))
             return self.cursor.fetchone()
         except mysql.connector.Error as err:
             print(f"Error: {err}")
             return None
+        
+    
     
     
         
