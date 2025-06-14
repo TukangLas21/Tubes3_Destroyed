@@ -26,12 +26,21 @@ class Connector:
                 self.cursor = self.connection.cursor(True)
                 print("Connection established successfully")
                 
-                ensure_db = self.ensure_database_exists()
-                if ensure_db:
-                    print("Database ensured and ready to use")
-                    self.connection.database = self.database # make sure database is set
+                # Check if database already exists
+                self.cursor.execute("SHOW DATABASES")
+                existing_databases = [db[0] for db in self.cursor.fetchall()]
+                if self.database in existing_databases:
+                    print(f"Database '{self.database}' already exists")
+                    self.cursor.execute(f"USE {self.database}")
+                    self.connection.database = self.database
                 else:
-                    raise Exception("Failed to ensure database exists")
+                    print(f"Database '{self.database}' does not exist, will create it")
+                    ensure_db = self.ensure_database_exists()
+                    if ensure_db:
+                        print("Database ensured and ready to use")
+                        self.connection.database = self.database # make sure database is set
+                    else:
+                        raise Exception("Failed to ensure database exists")
                 
             else:
                 print("Connection failed, no database specified")
