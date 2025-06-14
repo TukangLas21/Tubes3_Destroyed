@@ -26,5 +26,14 @@ def extract_text(file_path):
         print(f"Error processing file '{file_path}': {e}")
         return None
     
+
+if __name__ == "__main__":
+    file_path = input("Enter the path to the PDF file: ")
+    text = extract_text(file_path)
     
+    if text:
+        print("Extracted Text:")
+        print(text)
+    else:
+        print("No text extracted.")
         
