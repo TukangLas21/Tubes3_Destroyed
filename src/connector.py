@@ -1,6 +1,8 @@
 import mysql.connector
 import os
 
+SRC_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.dirname(SRC_DIR)
 SQL_PATH = "data/applicant_data.sql"
 
 class Connector:
@@ -53,9 +55,7 @@ class Connector:
             self.cursor.execute(f"CREATE DATABASE IF NOT EXISTS {self.database}")
             self.cursor.execute(f"USE {self.database}")
             
-            current_dir = os.path.dirname(os.path.abspath(__file__))
-            project_root = os.path.dirname(current_dir)
-            sql_file_path = os.path.join(project_root, SQL_PATH)
+            sql_file_path = os.path.join(ROOT_DIR, SQL_PATH)
             
             with open(sql_file_path, 'r', encoding='utf-8') as file:
                 print(f"Executing SQL commands from {sql_file_path}")

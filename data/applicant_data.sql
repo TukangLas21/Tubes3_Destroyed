@@ -17,13 +17,13 @@
 /*M!100616 SET @OLD_NOTE_VERBOSITY=@@NOTE_VERBOSITY, NOTE_VERBOSITY=0 */;
 
 --
--- Table structure for table `applicantdetail`
+-- Table structure for table `applicationdetail`
 --
 
-DROP TABLE IF EXISTS `applicantdetail`;
+DROP TABLE IF EXISTS `applicationdetail`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `applicantdetail` (
+CREATE TABLE `applicationdetail` (
   `detail_id` int(11) NOT NULL,
   `applicant_id` int(11) NOT NULL,
   `application_role` varchar(100) DEFAULT NULL,
@@ -35,12 +35,12 @@ CREATE TABLE `applicantdetail` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `applicantdetail`
+-- Dumping data for table `applicationdetail`
 --
 
-LOCK TABLES `applicantdetail` WRITE;
-/*!40000 ALTER TABLE `applicantdetail` DISABLE KEYS */;
-INSERT INTO `applicantdetail` VALUES
+LOCK TABLES `applicationdetail` WRITE;
+/*!40000 ALTER TABLE `applicationdetail` DISABLE KEYS */;
+INSERT INTO `applicationdetail` VALUES
 (1,1,'ACCOUNTANT','ACCOUNTANT/10554236.pdf'),
 (2,2,'ACCOUNTANT','ACCOUNTANT/10674770.pdf'),
 (3,3,'ACCOUNTANT','ACCOUNTANT/11163645.pdf'),
@@ -521,7 +521,7 @@ INSERT INTO `applicantdetail` VALUES
 (478,78,'TEACHER','TEACHER/16270906.pdf'),
 (479,79,'TEACHER','TEACHER/16820422.pdf'),
 (480,80,'TEACHER','TEACHER/17311685.pdf');
-/*!40000 ALTER TABLE `applicantdetail` ENABLE KEYS */;
+/*!40000 ALTER TABLE `applicationdetail` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
