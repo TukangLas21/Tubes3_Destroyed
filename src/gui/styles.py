@@ -109,8 +109,28 @@ BUTTON_S = ft.ButtonStyle(
     overlay_color=ft.Colors.TRANSPARENT,
 
     shape = ft.RoundedRectangleBorder(radius=24),
-    padding=ft.padding.symmetric(horizontal=44, vertical=12),
+    padding=ft.padding.symmetric(horizontal=24, vertical=12),
     side=ft.BorderSide(width=1, color=APP_COLORS["stroke"]),
+)
+
+# Sejujurnya ini dibikin untuk option button yang bentuk button, bukan untuk segmented (yg skrg)
+# Semoga ada waktu untuk edit tapi kalo ngga ya gapapa sih kayaknya UI ga segede itu penilaiannya oakwaowoakw
+BUTTON_OPTION_DEFAULT = ft.ButtonStyle(
+    bgcolor = APP_COLORS["white-transparent"],
+    color = APP_COLORS["grey"],
+    overlay_color=ft.Colors.TRANSPARENT,
+
+    shape = ft.RoundedRectangleBorder(radius=24),
+    padding=ft.padding.symmetric(horizontal=24, vertical=20),
+)
+
+BUTTON_OPTION_SELECTED = ft.ButtonStyle(
+    bgcolor = APP_COLORS["black-transparent"],
+    color = APP_COLORS["white"],
+    overlay_color=ft.Colors.TRANSPARENT,
+
+    shape = ft.RoundedRectangleBorder(radius=24),
+    padding=ft.padding.symmetric(horizontal=24, vertical=21),
 )
 
 # Components - Text Field
