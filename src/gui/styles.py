@@ -8,7 +8,8 @@ APP_COLORS = {
     "white": "#FEFDFF",
 
     "black-transparent": ft.Colors.with_opacity(0.5, '#0B0E16'),
-    "white-transparent": ft.Colors.with_opacity(0.1, "#FEFDFF")
+    "white-transparent": ft.Colors.with_opacity(0.1, "#FEFDFF"),
+    "glass": ft.Colors.with_opacity(0.05, "#FEFDFF")
 }
 
 gradient = ft.LinearGradient(
@@ -37,7 +38,8 @@ CAPTION_STYLE = ft.TextStyle(
 HEADING_STYLE = ft.TextStyle(
     font_family="SF Pro Medium",
     size=32,
-    color = APP_COLORS["white"]
+    color = APP_COLORS["white"],
+    letter_spacing = -1
 )
 
 SH1_STYLE = ft.TextStyle(
