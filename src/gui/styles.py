@@ -22,13 +22,16 @@ gradient = ft.LinearGradient(
 DISPLAY_STYLE = ft.TextStyle(
     font_family="SF Pro Medium",
     size=72,
-    color = APP_COLORS["white"]
+    color = APP_COLORS["white"],
+    letter_spacing = -2,
+    height = 1  # height is 1x font size
 )
 
 CAPTION_STYLE = ft.TextStyle(
     font_family="SF Pro Regular",
     size=24,
-    color = APP_COLORS["grey"]
+    color = APP_COLORS["grey"],
+    letter_spacing = -1
 )
 
 HEADING_STYLE = ft.TextStyle(
@@ -88,7 +91,6 @@ BUTTON_L = ft.ButtonStyle(
     shape = ft.RoundedRectangleBorder(radius=32),
     padding=ft.padding.symmetric(horizontal=44, vertical=24),
     side=ft.BorderSide(width=1, color=APP_COLORS["stroke"]),
-
 )
 
 BUTTON_M = ft.ButtonStyle(
@@ -96,10 +98,19 @@ BUTTON_M = ft.ButtonStyle(
     color = APP_COLORS["white"],
     overlay_color=ft.Colors.TRANSPARENT,
 
-    shape = ft.RoundedRectangleBorder(radius=32),
+    shape = ft.RoundedRectangleBorder(radius=24),
+    padding=ft.padding.symmetric(horizontal=44, vertical=24),
+    side=ft.BorderSide(width=1, color=APP_COLORS["stroke"]),
+)
+
+BUTTON_S = ft.ButtonStyle(
+    bgcolor = APP_COLORS["black-transparent"],
+    color = APP_COLORS["white"],
+    overlay_color=ft.Colors.TRANSPARENT,
+
+    shape = ft.RoundedRectangleBorder(radius=24),
     padding=ft.padding.symmetric(horizontal=44, vertical=12),
     side=ft.BorderSide(width=1, color=APP_COLORS["stroke"]),
-
 )
 
 # Components - Text Field
@@ -139,47 +150,28 @@ bg_image = ft.BoxDecoration (
         )
     )
 
-# PAGE STYLING!!
-def setup_page(page):
-    
-    page.title = "DestroyedCV"
-    page.window.width = 1280
-    page.window.height = 720
-    
-    # maaf ya ga ada bikin responsif responsif an awokawoka
-    page.window_min_width = 1280
-    page.window_min_height = 720
-    page.window_max_width = 1280
-    page.window_max_height = 720
-    
-    page.vertical_alignment = 'center'
-    page.horizontal_alignment = 'center'
-    
-    # Fonts setup
-    page.fonts = {
-        "SF Pro Regular": "./gui/assets/fonts/SF-Pro-Text-Regular.otf",
-        "SF Pro Medium": "./gui/assets/fonts/SF-Pro-Text-Medium.otf"
-    }
-    page.theme = ft.Theme(font_family="SF Pro Regular") # Default app font
-        
-    # Stack: background image at bottom, content above
-    content_container = ft.Container(
-        expand=True,
-        content=ft.Stack([
-            # Background image
-            ft.Image(
-                src="gui/assets/images/bg.png",
-                fit=ft.ImageFit.COVER,
-            ),
-            # Pages will include their main content here
-            ft.Container(
-                expand=True,
-                content=ft.Column([], alignment=ft.MainAxisAlignment.CENTER)
-            )
-        ])
-    )
-    
-    page.add(content_container)
-    
-    # Return the content container where specific pages can add their elements by appending the stack
-    return content_container.content.controls[1].content
+# Components - Navbar
+navbar_container = ft.Container(
+    content=ft.Row(
+        controls=[
+            ft.Text("Beranda", style=MENU_STYLE),
+            ft.Text("Search and Match", style=MENU_STYLE),
+            ft.Text("Tentang Kami", style=MENU_STYLE),
+            ft.Text("Keluar", style=MENU_STYLE),
+        ],
+        spacing=44
+    ),
+    width=540,
+    padding=ft.padding.symmetric(horizontal=32, vertical=16),
+    bgcolor=APP_COLORS["black-transparent"],
+    border=ft.border.all(width=1, color=APP_COLORS["stroke"]),
+    border_radius=ft.border_radius.all(32)
+)
+
+navbar = ft.AppBar(
+        title=navbar_container,
+        center_title=True,
+        bgcolor=ft.Colors.TRANSPARENT,
+        elevation=0,
+        toolbar_height=112 # Set the height to be (60px gap + ~52px nav bar height) from the top
+)
