@@ -3,11 +3,11 @@ import time
 from connector import Connector
 from encryption import Encryption
 from pdf_processor import extract_text_regex, extract_text_strmatching
+from regex_func import parse_cv
 from algorithm.fuzzy import fuzzy_search
 from algorithm.bm import BoyerMoore
 from algorithm.ac import AhoCorasick
 from algorithm.kmp import KMP
-
 
 def exact_search(keywords, cv_texts, algorithm):
     search_result = {
@@ -20,7 +20,7 @@ def exact_search(keywords, cv_texts, algorithm):
     }
     keywords_found = set()
     
-    for detail_id, cv_data in cv_texts.item():
+    for detail_id, cv_data in cv_texts.items():
         text = cv_data['text']
         for keyword in keywords:
             num_matches = 0
@@ -40,7 +40,7 @@ def exact_search(keywords, cv_texts, algorithm):
             
     return search_result, keywords_found
 
-def fuzzy_search(keywords, cv_texts, exact_search_result, percentage=75.0):
+def fuzzy_search_start(keywords, cv_texts, exact_search_result, percentage=75.0):
 
     for detail_id, cv_data in cv_texts.items():
         text = cv_data['text']
@@ -55,20 +55,25 @@ def fuzzy_search(keywords, cv_texts, exact_search_result, percentage=75.0):
     return exact_search_result
 
 # Main function to start the search process
-def start_search(keywords, algorithm, all_cv_info, number_of_results):
+def start_search(keywords, algorithm, all_cv_info, number_of_results, connector: Connector):
     keywords_list = {keywords.strip() for keywords in keywords.split(',') if keywords.strip()}
     if not keywords_list:
         return None
     
     cv_texts = {}
-    for cv_info in all_cv_info:
-        raw_text = extract_text_strmatching(cv_info['cv_path'])
-        if raw_text:
-            cv_texts[cv_info['detail_id']] = {
-                'applicant_id': cv_info['applicant_id'],
-                'cv_path': cv_info['cv_path'],
-                'text': raw_text
+    for detail_id, applicant_id, cv_path in all_cv_info:
+        try:
+            text = extract_text_strmatching(cv_path)
+            if not text:
+                raise ValueError(f"Could not extract text from CV at {cv_path}")
+            cv_texts[detail_id] = {
+                "applicant_id": applicant_id,
+                "cv_path": cv_path,
+                "text": text
             }
+        except Exception as e:
+            print(f"Error processing CV at {cv_path}: {e}")
+            continue
             
     exact_start = time.time()
     search_result, keywords_found = exact_search(keywords_list, cv_texts, algorithm)
@@ -77,9 +82,10 @@ def start_search(keywords, algorithm, all_cv_info, number_of_results):
     
     keywords_not_found = keywords_list - keywords_found
     
+    fuzzy_start = fuzzy_end = 0
     if keywords_not_found:
         fuzzy_start = time.time()
-        search_result = fuzzy_search(keywords_not_found, cv_texts, search_result)
+        search_result = fuzzy_search_start(keywords_not_found, cv_texts, search_result)
         fuzzy_end = time.time()
         
     final_results = []
@@ -89,10 +95,48 @@ def start_search(keywords, algorithm, all_cv_info, number_of_results):
             final_results.append(result)
             
     final_results.sort(key=lambda x: x['accuracy_score'], reverse=True)
+    sorted_results = final_results[:number_of_results]
+    
+    try:
+        connector.connect()
+    except Exception as e:
+        print(f"Error connecting to database: {e}")
+        return None 
+    
+    # Get applicant profiles for the results
+    for result in sorted_results:
+        applicant_id = result['applicant_id']
+        profile = connector.get_decrypted_profile(applicant_id)
+        result['profile'] = profile if profile else {
+            "first_name": "Unknown",
+            "last_name": "Unknown",
+            "address": "Unknown",
+            "phone_number": "Unknown"
+        }
+    connector.close()
     
     return {
-        "results": final_results[:number_of_results],
+        "results": sorted_results,
         "exact_time": exact_time,
-        "fuzzy_time": fuzzy_end - fuzzy_start if keywords_not_found else 0
-        
+        "fuzzy_time": fuzzy_end - fuzzy_start if keywords_not_found else 0     
     }
+
+def get_cv_text(cv_path):
+    text = extract_text_regex(cv_path)
+    if not text:
+        return None
+    
+    return text.strip()
+    
+def get_cv_info(cv_path):
+    text = get_cv_text(cv_path)
+    if not text:
+        return None
+    
+    cv_info = parse_cv(text)
+    if not cv_info:
+        return None
+    
+    return cv_info
+
+

@@ -22,7 +22,6 @@ def test_connector(host, user, password, database, encryption_key=None):
     if connector.connection is not None and connector.connection.is_connected():
         raise Exception("Connection was not closed properly")
     
-    print("All tests passed, connection ready to be used.")
     return connector
 
 def encrypt_profiles(host, user, password, database, encryption_key):

@@ -17,6 +17,10 @@ class Connector:
         self.encryption = Encryption(encryption_key) if encryption_key else None
         
     def connect(self):
+        if self.connection and self.connection.is_connected():
+            print("Already connected to the database")
+            return
+        
         try:
             self.connection = mysql.connector.connect(
                 host=self.host,
@@ -40,16 +44,17 @@ class Connector:
                 
             else:
                 print("Connection failed, no database specified")
-                self.cursor = None
+                self.cursor.close() if self.cursor else None
+                self.connection.close() if self.connection else None
                 
         except mysql.connector.Error as err:
             print(f"Error SQL: {err}")
-            self.connection = None
-            self.cursor = None
+            self.connection.close() if self.connection else None
+            self.cursor.close() if self.cursor else None
         except Exception as e:
             print(f"Unexpected error: {e}")
-            self.connection = None
-            self.cursor = None
+            self.connection.close() if self.connection else None
+            self.cursor.close() if self.cursor else None
             
     # Create database if not exists and set up the data
     def ensure_database_exists(self):
@@ -91,16 +96,15 @@ class Connector:
             print("Connection closed")
     
     # Gets all CV paths and their corresponding applicant IDs, saves in a dictionary
-    def get_paths_applicantid(self):
+    def get_paths_id(self):
         if not self.connection or not self.connection.is_connected():
             print("No active connection")
             return None
         
         try:
-            query = "SELECT cv_path, applicant_id FROM ApplicationDetail"
+            query = "SELECT detail_id, applicant_id, cv_path FROM ApplicationDetail"
             self.cursor.execute(query)
-            results = self.cursor.fetchall()
-            return {cv_path: applicant_id for cv_path, applicant_id in results}
+            return self.cursor.fetchall()
         except mysql.connector.Error as err:
             print(f"Error: {err}")
             return None

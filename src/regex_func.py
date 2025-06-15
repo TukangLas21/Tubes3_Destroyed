@@ -84,31 +84,6 @@ def get_experiences(text):
             'date': date
         })
     
-    # exp_entries = re.split(r'\n(?=[A-Z][a-zA-Z\s]+, \d{2}\/\d{4})', exp_block.strip()) 
-    # experience_list = []
-    # for entry in exp_entries:
-    #     if not entry.strip():
-    #         continue
-        
-    #     job_title = re.search(r'(?i)(?:(?:(?:|\d{4}|\d{1,2}\/\d{4}|[a-z]{3,}\s\d{4})to\s*(?:current|\d{4}|\d{1,2}\/\d{4}|[a-z]{3,}\s\d{4}))|(?:\s*Company Name\s*,*\s*City\s*,*\s*State\s*))?\s*(.*?)\s*(?:(?:[a-z]{3,}\s\d{4}|\d{1,2}\/\d{4})\s+to()|Company Name)', entry)
-    #     company_name = "Company Name"
-    #     if job_title:
-    #         job_title = job_title.group(1).strip()
-    #     else:
-    #         job_title = "Unknown Job Title"
-             
-    #     date = re.search(r'(?i)(\d{1,2}\/\d{4}|[a-z]{3,}\s*\d{4})\s+to\s+(current|[a-z]{3,}\s*\d{4}|\d{1,2}\/\d{4})', entry)
-    #     if date:
-    #         date = date.group(0).strip()
-    #     else:
-    #         date = "Unknown Date"
-            
-    #     experience_list.append({
-    #         'job_title': job_title,
-    #         'company_name': company_name,
-    #         'date': date
-    #     })
-    
     return experience_list if experience_list else None
 
 # Function to extract education --> needs to be processed further
