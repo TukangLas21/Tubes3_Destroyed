@@ -1,7 +1,8 @@
 import flet as ft
 from styles import *
 
-#Text Fields
+''' SEARCH  '''
+# Input Fields
 keyword_field = create_textfield(
     label= "Kata Kunci",
     hint_text="Contoh: React, NextJS, Java"
@@ -41,8 +42,7 @@ def search_submit_function(e):
     print(f"Jumlah Top Matches: {top_matches_field.controls[1].value}")
     print(f"Algoritma: {algoritma_option.controls[1].selected}")
 
-
-    
+# Search Containernya
 search_container = ft.Container(
     ft.Column([
         ft.Text("Cari CV Sesuai Keinginanmu", style=HEADING_STYLE),
@@ -70,6 +70,130 @@ search_container = ft.Container(
     width = 510
 )
 
+''' RESULT  '''
+def summary_function(e):
+    print("Go to summary")
+
+def cv_function(e):
+    print("Go to CV")
+
+# Result cards
+def create_result_card(name: str, matches: int,):
+    return ft.Container(
+    ft.Column([
+        # Bagian atas
+        ft.Column([
+            # Judul dan Matches
+            ft.Row([
+                ft.Text(name, style = SH1_STYLE),
+                ft.Text(f"{matches} {'Matches' if (matches > 1) else 'Match'}", 
+                        style = BODY1_SECONDARY_STYLE),
+            ],
+            spacing = 16,
+            ),
+
+            # Matches keywords
+            ft.Column([
+                ft.Text("Matched keywords:", style = BODY2_SECONDARY_STYLE),
+                ft.Text("React: 1 occurence (ini diappend nanti)", style = BODY2_SECONDARY_STYLE),
+                ft.Text("Express: 1 occurence", style = BODY2_SECONDARY_STYLE),
+                ft.Text("HTML: 1 occurence", style = BODY2_SECONDARY_STYLE),
+                ft.Text("HTML: 1 occurence", style = BODY2_SECONDARY_STYLE),
+                ft.Text("HTML: 1 occurence", style = BODY2_SECONDARY_STYLE),
+            ],
+            spacing = 0,
+            height = 100,
+            scroll = ft.ScrollMode.HIDDEN, # scroll jika keywordnya banyak
+            )
+        ],
+        # Pengaturan Column
+        spacing = 12,
+        ),
+
+        # Bagian Bawah
+        ft.Row([
+            ft.FilledButton(
+                content = ft.Text("Summary", style = BODY1_PRIMARY_STYLE),
+                style = BUTTON_S,
+                on_click = summary_function
+            ),
+            ft.FilledButton(
+                content = ft.Text("Lihat CV", style = BODY1_PRIMARY_STYLE),
+                style = BUTTON_S,
+                on_click = cv_function
+            ),
+        ],
+        expand = True,
+        ),
+
+    ],
+    # Pengaturan Column
+    spacing = 44,
+    width = 230,
+    ),
+    # Pengaturan column container (glass style)
+    bgcolor = APP_COLORS["glass"],
+    padding = ft.padding.symmetric(horizontal = 32, vertical = 32),
+    border_radius = 24, border = ft.border.all(width = 1, color = APP_COLORS["white-transparent"])
+)
+
+# Result Container
+result_container = ft.Container(
+    ft.Column([
+        # Title
+        ft.Column([
+            ft.Text("Hasil Pencarian", style = HEADING_STYLE),
+            ft.Text("Exact Match: 100 CVs di-scan dalam 100 ms.", style = BODY1_SECONDARY_STYLE),
+            ft.Text("Fuzzy Match: 100 CVs di-scan dalam 100 ms.", style = BODY1_SECONDARY_STYLE)
+        ],
+        spacing = 0,
+        horizontal_alignment = ft.CrossAxisAlignment.CENTER,
+        ),
+
+        # Result Cards, 3 cards per row
+        ft.Column([
+            # 1st Row of Cards
+            ft.Row([
+                create_result_card(name="Lucas", matches=4),
+                create_result_card(name="Nicoa", matches=1),
+                create_result_card(name="Lucas", matches=4),
+            ],
+            spacing = 16),
+
+            # 2nd Row of Cards
+            ft.Row([
+                create_result_card(name="Lucas", matches=4),
+                create_result_card(name="Nicoa", matches=1),
+                create_result_card(name="Lucas", matches=4),
+            ],
+            spacing = 16),
+        ],
+        spacing = 16)
+
+    ],
+    spacing = 24,
+    horizontal_alignment = ft.CrossAxisAlignment.CENTER,
+    ),
+    alignment = ft.alignment.top_center, expand = True
+)
+
+''' SEARCH + RESULT (Result di bawah Search) '''
+search_and_result = ft.Container(
+    ft.Column([
+        # berlapis yak tapi ini biar bisa onclick
+        search_container,
+        result_container,
+    ],
+    spacing = 24,
+    horizontal_alignment = ft.CrossAxisAlignment.CENTER,
+    scroll = ft.ScrollMode.HIDDEN,
+    expand = True,
+
+    ),
+width = 1000,
+alignment = ft.alignment.top_center, expand = True,
+)
+
 def main(page:ft.Page):
     page.title = "DestroyedCV"
     page.window.width = 1280
@@ -94,6 +218,6 @@ def main(page:ft.Page):
     page.bgcolor = ft.Colors.TRANSPARENT
     page.decoration = bg_image
     page.appbar = navbar
-    page.add(search_container)
+    page.add(search_and_result)
     page.update()
 ft.app(main)

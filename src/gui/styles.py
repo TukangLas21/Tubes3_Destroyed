@@ -111,7 +111,7 @@ BUTTON_S = ft.ButtonStyle(
     overlay_color=ft.Colors.TRANSPARENT,
 
     shape = ft.RoundedRectangleBorder(radius=24),
-    padding=ft.padding.symmetric(horizontal=24, vertical=12),
+    padding=ft.padding.symmetric(horizontal=24, vertical=16),
     side=ft.BorderSide(width=1, color=APP_COLORS["stroke"]),
 )
 
