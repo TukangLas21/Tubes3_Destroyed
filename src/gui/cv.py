@@ -2,10 +2,11 @@ import flet as ft
 from styles import *
 
 # nanti ganti ya mas BE
-def back_function():
-    print("Balik ke page sebelumnya woi")
+def back_function(e):
+    page = e.page
+    page.on_view_pop
 
-summary_content = ft.Container(
+cv_content = ft.Container(
     ft.Column([
         # berlapis yak tapi ini biar bisa onclick
         ft.Container(
@@ -64,30 +65,31 @@ alignment = ft.alignment.top_center, expand = True,
 # margin=ft.margin.only(bottom=56),
 )
 
-def main(page:ft.Page):
-    page.title = "DestroyedCV"
-    page.window.width = 1280
-    page.window.height = 720
+''' Individual Page Testing :D '''
+# def main(page:ft.Page):
+#     page.title = "DestroyedCV"
+#     page.window.width = 1280
+#     page.window.height = 720
     
-    page.window.min_width = 1280
-    page.window.min_height = 720
-    page.window.max_width = 1280
-    page.window.max_height = 720
+#     page.window.min_width = 1280
+#     page.window.min_height = 720
+#     page.window.max_width = 1280
+#     page.window.max_height = 720
 
-    page.vertical_alignment = ft.MainAxisAlignment.CENTER
-    page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
-    page.bgcolor=ft.Colors.TRANSPARENT
+#     page.vertical_alignment = ft.MainAxisAlignment.CENTER
+#     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
+#     page.bgcolor=ft.Colors.TRANSPARENT
 
-    page.fonts = {
-        "SF Pro Regular": "./assets/fonts/SF-Pro-Text-Regular.otf",
-        "SF Pro Medium": "./assets/fonts/SF-Pro-Text-Medium.otf",
-    }
-    page.theme = ft.Theme(font_family="SF Pro Regular")
+#     page.fonts = {
+#         "SF Pro Regular": "./assets/fonts/SF-Pro-Text-Regular.otf",
+#         "SF Pro Medium": "./assets/fonts/SF-Pro-Text-Medium.otf",
+#     }
+#     page.theme = ft.Theme(font_family="SF Pro Regular")
 
-    # Page setup
-    page.bgcolor = ft.Colors.TRANSPARENT
-    page.decoration = bg_image
-    page.appbar = navbar
-    page.add(summary_content)
-    page.update()
-ft.app(main)
+#     # Page setup
+#     page.bgcolor = ft.Colors.TRANSPARENT
+#     page.decoration = bg_image
+#     page.appbar = navbar
+#     page.add(summary_content)
+#     page.update()
+# ft.app(main)

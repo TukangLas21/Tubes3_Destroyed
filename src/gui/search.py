@@ -72,10 +72,12 @@ search_container = ft.Container(
 
 ''' RESULT  '''
 def summary_function(e):
-    print("Go to summary")
+    page = e.page
+    page.go("/summary")
 
 def cv_function(e):
-    print("Go to CV")
+    page = e.page
+    page.go("/cv")
 
 # Result cards
 def create_result_card(name: str, matches: int,):
@@ -194,30 +196,31 @@ width = 1000,
 alignment = ft.alignment.top_center, expand = True,
 )
 
-def main(page:ft.Page):
-    page.title = "DestroyedCV"
-    page.window.width = 1280
-    page.window.height = 720
+''' Individual Page Testing :D '''
+# def main(page:ft.Page):
+#     page.title = "DestroyedCV"
+#     page.window.width = 1280
+#     page.window.height = 720
     
-    page.window.min_width = 1280
-    page.window.min_height = 720
-    page.window.max_width = 1280
-    page.window.max_height = 720
+#     page.window.min_width = 1280
+#     page.window.min_height = 720
+#     page.window.max_width = 1280
+#     page.window.max_height = 720
 
-    page.vertical_alignment = ft.MainAxisAlignment.CENTER
-    page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
-    page.bgcolor=ft.Colors.TRANSPARENT
+#     page.vertical_alignment = ft.MainAxisAlignment.CENTER
+#     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
+#     page.bgcolor=ft.Colors.TRANSPARENT
 
-    page.fonts = {
-        "SF Pro Regular": "./assets/fonts/SF-Pro-Text-Regular.otf",
-        "SF Pro Medium": "./assets/fonts/SF-Pro-Text-Medium.otf",
-    }
-    page.theme = ft.Theme(font_family="SF Pro Regular")
+#     page.fonts = {
+#         "SF Pro Regular": "./assets/fonts/SF-Pro-Text-Regular.otf",
+#         "SF Pro Medium": "./assets/fonts/SF-Pro-Text-Medium.otf",
+#     }
+#     page.theme = ft.Theme(font_family="SF Pro Regular")
 
-    # Page setup
-    page.bgcolor = ft.Colors.TRANSPARENT
-    page.decoration = bg_image
-    page.appbar = navbar
-    page.add(search_and_result)
-    page.update()
-ft.app(main)
+#     # Page setup
+#     page.bgcolor = ft.Colors.TRANSPARENT
+#     page.decoration = bg_image
+#     page.appbar = navbar
+#     page.add(search_and_result)
+#     page.update()
+# ft.app(main)

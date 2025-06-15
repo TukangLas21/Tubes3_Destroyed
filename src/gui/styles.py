@@ -183,7 +183,7 @@ navbar_container = ft.Container(
         ],
         spacing=44
     ),
-    width=540,
+    width=640,
     padding=ft.padding.symmetric(horizontal=32, vertical=16),
     bgcolor=APP_COLORS["black-transparent"],
     border=ft.border.all(width=1, color=APP_COLORS["stroke"]),
@@ -191,9 +191,52 @@ navbar_container = ft.Container(
 )
 
 navbar = ft.AppBar(
-        title=navbar_container,
-        center_title=True,
-        bgcolor=ft.Colors.TRANSPARENT,
-        elevation=0,
-        toolbar_height=112 # Set the height to be (60px gap + ~52px nav bar height) from the top
+    title=navbar_container,
+    center_title=True,
+    bgcolor=ft.Colors.TRANSPARENT,
+    elevation=0,
+    toolbar_height=112 # Set the height to be (60px gap + ~52px nav bar height) from the top
 )
+
+def create_navbar(page: ft.Page):
+    return ft.AppBar(
+        center_title = True,
+        bgcolor = APP_COLORS["black-transparent"],
+        toolbar_height = 112,
+        toolbar_opacity = 0,
+
+        # Dont use actions (dia rata kanan), use title space for navigation
+        title = ft.Container(
+            content=ft.Row(
+                controls=[
+                    ft.Container(
+                        ft.Text("Beranda", style=MENU_STYLE),
+                        on_click = lambda _: page.go("/beranda")
+                    ),
+
+                    ft.Container(
+                        ft.Text("Search and Match", style=MENU_STYLE),
+                        on_click = lambda _: page.go("/search")
+                    ),
+
+                    ft.Container(
+                        ft.Text("Tentang Kami", style=MENU_STYLE),
+                        on_click = lambda _: page.go("/tentang")
+                    ),
+
+                    ft.Container(
+                        ft.Text("Keluar", style=MENU_STYLE),
+                        on_click = lambda _: page.go("/")
+                    ),
+                ],
+                spacing=44,
+            ),
+            width=640,
+            alignment=ft.alignment.center,
+            # Styling container
+            padding=ft.padding.symmetric(horizontal=32, vertical=16),
+            bgcolor=APP_COLORS["black-transparent"],
+            border=ft.border.all(width=1, color=APP_COLORS["stroke"]),
+            border_radius=ft.border_radius.all(32)
+        ),
+    )
