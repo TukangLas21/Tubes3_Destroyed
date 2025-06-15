@@ -54,18 +54,6 @@ def main(page: ft.Page):
             )
         )
 
-        # ''' PLACEHOLDER '''
-        # if page.route == "/store":
-        #     page.views.append(
-        #         ft.View(
-        #             route = "/store",
-        #             controls = [
-        #                 ft.AppBar(title=ft.Text("Store"), bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST),
-        #                 ft.ElevatedButton("Go Home", on_click=lambda _: page.go("/")),
-        #             ],
-        #         )
-        #     )
-
         ''' Beranda '''
         if page.route == "/beranda":
             page.views.append(
@@ -103,12 +91,12 @@ def main(page: ft.Page):
            )
            
         ''' Summary '''
-        if page.route == "/summary":
-            page.views.append(
+        if page.route.startswith("/summary"):  # This is important - use startswith for parameters
+            page.views.append( 
                 ft.View(
-                    route = "/summary",
+                    route = route.route,  # Use the full route with parameters
                     controls = [
-                        summary.summary_content
+                        summary.create_summary_content(route.route)  # Pass the full route with parameters
                     ],
                     # *** VIEW SETUP ***
                     vertical_alignment = ft.MainAxisAlignment.CENTER,
@@ -118,23 +106,16 @@ def main(page: ft.Page):
                     bgcolor = ft.Colors.TRANSPARENT,
                     decoration = bg_image,
                 )
-           )
+            )
 
         ''' CV '''
-        if page.route == "/cv":
+        if route.route.startswith("/cv"):  # This is important - use startswith for parameters
+            from cv import create_cv_content  # Import your CV page
             page.views.append(
                 ft.View(
-                    route = "/cv",
-                    controls = [
-                        cv.cv_content
-                    ],
-                    # *** VIEW SETUP ***
-                    vertical_alignment = ft.MainAxisAlignment.CENTER,
-                    horizontal_alignment = ft.CrossAxisAlignment.CENTER,
-                    appbar = main_navbar,
-                    # Load BG Image
-                    bgcolor = ft.Colors.TRANSPARENT,
-                    decoration = bg_image,
+                    "/cv",
+                    [create_cv_content(route.route)],  # Pass the full route with parameters
+                    scroll=ft.ScrollMode.AUTO
                 )
             )
 

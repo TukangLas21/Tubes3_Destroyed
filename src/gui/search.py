@@ -1,6 +1,7 @@
 import flet as ft
 import os
 import sys
+from urllib.parse import urlencode
 from styles import *
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from connector import Connector
@@ -40,7 +41,6 @@ algoritma_option = ft.Column(
     ]
 )
 
-# Fixed search function with better error handling and debugging
 def search_submit_function(e):
     page = e.page
     
@@ -127,8 +127,11 @@ def search_submit_function(e):
             print(f"Results type: {type(results)}")
             print(f"Results length: {len(results) if isinstance(results, list) else 'N/A'}")
             
+            Connector.get_instance().connect()
+            total_CVs = len(Connector.get_instance().get_paths_id())
+            Connector.get_instance().close()
             # Update status texts
-            status_text_exact.value = f"Exact Match: {len(results)} CV ditemukan dalam {exact_search_result:.4f} detik."
+            status_text_exact.value = f"Exact Match: {total_CVs} diproses dalam {exact_search_result:.4f} detik."
             if fuzzy_search_result == 0:
                 status_text_fuzzy.value = "Fuzzy Match tidak dijalankan."
             else:
@@ -179,6 +182,7 @@ def search_submit_function(e):
                                 'cv_path': result.get('cv_path')
                             }
                             card.content.controls[2].controls[1].data = {
+                                'detail_id': result.get('detail_id'),  # Added detail_id for CV page
                                 'cv_path': result.get('cv_path')
                             }
                         
@@ -259,24 +263,34 @@ def summary_function(e):
     try:
         detail_id = e.control.data['detail_id']
         applicant_id = e.control.data['applicant_id']
-        cv_path = e.control.data['cv_path']
         page = e.page
-        print(f"Summary clicked for: {detail_id}, {applicant_id}, {cv_path}")
-        page.go("/summary")
+        
+        params = {
+            'detail_id': str(detail_id),
+            'applicant_id': str(applicant_id)
+        }
+        url_params = urlencode(params)
+        
+        print(f"Summary clicked for: {detail_id}, {applicant_id}")
+        print(f"Navigating to summary with params: /summary?{url_params}")
+        page.go(f"/summary?{url_params}")
     except Exception as ex:
         print(f"Summary function error: {ex}")
 
 def cv_function(e):
     try:
-        cv_path = e.control.data['cv_path']
+        detail_id = e.control.data['detail_id']
         page = e.page
-        print(f"CV clicked for: {cv_path}")
-        page.go("/cv")
+        params = {
+            'detail_id': str(detail_id)
+        }
+        url_params = urlencode(params)
+        print(f"CV clicked for: {detail_id}")
+        page.go(f"/cv?{url_params}")
     except Exception as ex:
         print(f"CV function error: {ex}")
 
-# Result cards - Fixed version
-# Fixed Result cards function
+
 def create_result_card(result_data: dict):
     keywords_column = ft.Column(spacing=2, scroll=ft.ScrollMode.HIDDEN)
     keywords_column.controls.append(ft.Text("Matched keywords:", style=BODY2_SECONDARY_STYLE))

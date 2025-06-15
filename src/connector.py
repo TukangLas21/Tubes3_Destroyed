@@ -207,7 +207,7 @@ class Connector:
             return None
         
         try:
-            query = "SELECT first_name, last_name, address, phone_number FROM ApplicantProfile WHERE applicant_id = %s"
+            query = "SELECT first_name, last_name, date_of_birth, address, phone_number FROM ApplicantProfile WHERE applicant_id = %s"
             self.cursor.execute(query, (applicant_id,))
             profile = self.cursor.fetchone()
             
@@ -218,11 +218,83 @@ class Connector:
             decrypted_profile = {
                 'first_name': self.encryption.decrypt(profile[0]),
                 'last_name': self.encryption.decrypt(profile[1]),
-                'address': self.encryption.decrypt(profile[2]),
-                'phone_number': self.encryption.decrypt(profile[3])
+                'date_of_birth': profile[2],  # Assuming date_of_birth is not encrypted
+                'address': self.encryption.decrypt(profile[3]),
+                'phone_number': self.encryption.decrypt(profile[4])
             }
             
             return decrypted_profile
+        except mysql.connector.Error as err:
+            print(f"Error: {err}")
+            return None
+        except Exception as e:
+            print(f"Unexpected error: {e}")
+            return None
+        
+    def get_decrypted_cv(self, detail_id):
+        if not self.connection or not self.connection.is_connected():
+            print("No active connection")
+            return None
+        
+        try:
+            query = "SELECT cv_path FROM ApplicationDetail WHERE detail_id = %s"
+            self.cursor.execute(query, (detail_id,))
+            result = self.cursor.fetchone()
+            
+            if result:
+                cv_path = result[0]
+                if self.encryption:
+                    return self.encryption.decrypt(cv_path)
+                return cv_path
+            else:
+                print(f"No CV found for detail_id {detail_id}")
+                return None
+        except mysql.connector.Error as err:
+            print(f"Error: {err}")
+            return None
+        
+    def get_cv_path(self, detail_id):
+        if not self.connection or not self.connection.is_connected():
+            print("No active connection")
+            return None
+        
+        try:
+            query = "SELECT cv_path FROM ApplicationDetail WHERE detail_id = %s"
+            self.cursor.execute(query, (detail_id,))
+            result = self.cursor.fetchone()
+            
+            if result:
+                return result[0]
+            else:
+                print(f"No CV path found for detail_id {detail_id}")
+                return None
+        except mysql.connector.Error as err:
+            print(f"Error: {err}")
+            return None
+        except Exception as e:
+            print(f"Unexpected error: {e}")
+            return None
+        
+    def get_decrypted_name(self, detail_id):
+        if not self.connection or not self.connection.is_connected():
+            print("No active connection")
+            return None
+        
+        try:
+            query = """
+                SELECT a.first_name, a.last_name
+                FROM ApplicantProfile a
+                JOIN ApplicationDetail d ON a.applicant_id = d.applicant_id
+                WHERE d.detail_id = %s
+            """
+            self.cursor.execute(query, (detail_id,))
+            result = self.cursor.fetchone()
+            if result:
+                first_name, last_name = result
+                if self.encryption:
+                    return f"{self.encryption.decrypt(first_name)} {self.encryption.decrypt(last_name)}"
+                return f"{first_name} {last_name}"
+            
         except mysql.connector.Error as err:
             print(f"Error: {err}")
             return None
