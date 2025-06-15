@@ -65,6 +65,49 @@ alignment = ft.alignment.top_center, expand = True,
 # margin=ft.margin.only(bottom=56),
 )
 
+def create_cv_content(detail_id: int):
+    # proses detail_id menjadi data cv
+    cv_text = "" # parsing data ke sini
+    cv_content = ft.Container(
+        ft.Column([
+            # berlapis yak tapi ini biar bisa onclick
+            ft.Container(
+                ft.Row([
+                    ft.Icon(ft.Icons.ARROW_BACK, color=APP_COLORS["white"]),
+                    ft.Text(
+                        "Menunjukkan CV: Lucas", # jangan lupa ganti ini sesuai pemilik CV
+                        style = HEADING_STYLE,
+                        text_align = ft.TextAlign.CENTER
+                    ),
+                ], 
+                tight=True
+                ),
+                on_click = back_function
+            ),
+            ft.Container(
+                ft.Column(
+                    spacing = 8,
+                    controls = [
+                        ft.Text(cv_text, style = BODY2_SECONDARY_STYLE),
+                    ],
+                    width = 650,
+                ),
+                bgcolor = APP_COLORS["glass"],
+                padding = ft.padding.symmetric(horizontal = 32, vertical = 32),
+                border_radius = 24, border = ft.border.all(width = 1, color = APP_COLORS["white-transparent"])
+            ),
+        ],
+        spacing = 24,
+        horizontal_alignment = ft.CrossAxisAlignment.CENTER,
+        scroll = ft.ScrollMode.HIDDEN,
+        expand = True,
+
+        ),
+    alignment = ft.alignment.top_center, expand = True,
+    )
+
+    return cv_content
+
 ''' Individual Page Testing :D '''
 # def main(page:ft.Page):
 #     page.title = "DestroyedCV"
@@ -90,6 +133,6 @@ alignment = ft.alignment.top_center, expand = True,
 #     page.bgcolor = ft.Colors.TRANSPARENT
 #     page.decoration = bg_image
 #     page.appbar = navbar
-#     page.add(summary_content)
+#     page.add(cv_content)
 #     page.update()
 # ft.app(main)
