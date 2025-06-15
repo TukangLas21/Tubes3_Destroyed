@@ -36,13 +36,7 @@ class Connector:
                     self.cursor.execute(f"USE {self.database}")
                     self.connection.database = self.database
                 else:
-                    print(f"Database '{self.database}' does not exist, will create it")
-                    ensure_db = self.ensure_database_exists()
-                    if ensure_db:
-                        print("Database ensured and ready to use")
-                        self.connection.database = self.database # make sure database is set
-                    else:
-                        raise Exception("Failed to ensure database exists")
+                    raise ValueError(f"Database '{self.database}' does not exist. Please create it first.")
                 
             else:
                 print("Connection failed, no database specified")
@@ -95,18 +89,6 @@ class Connector:
         if self.connection and self.connection.is_connected():
             self.connection.close()
             print("Connection closed")
-            
-    def get_applicant_profile(self, applicant_id):
-        if not self.connection or not self.connection.is_connected():
-            print("No active connection")
-            return None
-        try:
-            query = "SELECT * FROM ApplicantProfile WHERE applicant_id = %s"
-            self.cursor.execute(query, (applicant_id,))
-            return self.cursor.fetchone()
-        except mysql.connector.Error as err:
-            print(f"Error: {err}")
-            return None
     
     # Gets all CV paths and their corresponding applicant IDs, saves in a dictionary
     def get_paths_applicantid(self):
@@ -217,3 +199,31 @@ class Connector:
             print(f"Unexpected error during decryption: {e}")
             return False
         
+    def get_decrypted_profile(self, applicant_id):
+        if not self.encryption or not self.connection or not self.connection.is_connected():
+            print("No active connection or encryption not set")
+            return None
+        
+        try:
+            query = "SELECT first_name, last_name, address, phone_number FROM ApplicantProfile WHERE applicant_id = %s"
+            self.cursor.execute(query, (applicant_id,))
+            profile = self.cursor.fetchone()
+            
+            if not profile:
+                print(f"No profile found for applicant ID {applicant_id}")
+                return None
+            
+            decrypted_profile = {
+                'first_name': self.encryption.decrypt(profile[0]),
+                'last_name': self.encryption.decrypt(profile[1]),
+                'address': self.encryption.decrypt(profile[2]),
+                'phone_number': self.encryption.decrypt(profile[3])
+            }
+            
+            return decrypted_profile
+        except mysql.connector.Error as err:
+            print(f"Error: {err}")
+            return None
+        except Exception as e:
+            print(f"Unexpected error: {e}")
+            return None

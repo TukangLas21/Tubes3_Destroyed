@@ -13,20 +13,27 @@ class Encryption:
         new_text = ""
         
         for char in text:
+            key_char = self.key[key_idx % len(self.key)]
+            key_shift = ord(key_char) - ord('a')
+            
             if char.isalpha():
-                key_char = self.key[key_idx % len(self.key)]
-                key_shift = ord(key_char) - ord('a')
-                
                 if 'a' <= char <= 'z':
                     base = ord('a')
                 else:
                     base = ord('A')
                     
                 char_code = ord(char) - base
-                new_char_code = (char_code + mode * key_shift) % 26
+                new_char_code = (char_code + (mode * key_shift)) % 26
                 new_text += chr(new_char_code + base)
-                
                 key_idx += 1
+                
+            elif char.isdigit():
+                base = ord('0')
+                char_code = ord(char) - base
+                new_char_code = (char_code + (mode * key_shift)) % 10
+                new_text += chr(new_char_code + base)
+                key_idx += 1
+                
             else:
                 new_text += char
                 

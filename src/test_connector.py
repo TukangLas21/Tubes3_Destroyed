@@ -57,7 +57,7 @@ if __name__ == "__main__":
     database = input("Enter database name: ")
     encryption_key = input("Enter encryption key: ")
     try:
-        connector = decrypt_profiles(host, user, password, database, encryption_key)
+        connector = encrypt_profiles(host, user, password, database, encryption_key)
     except Exception as e:
         print(f"Test failed: {e}")
     else:
