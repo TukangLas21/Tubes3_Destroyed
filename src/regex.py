@@ -4,10 +4,16 @@ import re
 Module for regex operations, extracts summary, skills, work experience, and education.
 """
 
+# Month set for cleaning degree names
+month_set = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+]
+
 # Function to extract summary 
 def get_summary(text):
     pattern = re.compile(
-        r'(?s)(?:Summary|Overview)\s*(.*?)(?=\s*(?:\Z|Work History|Work Experience|Experience|Skills|Qualifications|Education|Training|Certification)\b)',
+        r'(?s)(?:Summary|Overview)\s*(.*?)(?=\s*(?:\Z|Work History|Work Experience|Experience|Skills|Core Qualifications|Education|Training|Certification)\b)',
         # re.IGNORECASE
     )
     match = pattern.search(text)
@@ -19,7 +25,7 @@ def get_summary(text):
 # Function to extract skills
 def get_skills(text):
     pattern = re.compile(
-        r'(?s)(?:Skills|Qualifications)\s*(.*?)(?=\s*(?:\Z|Work History|Work Experience|Summary|Overview|Experience|Education|Training|Certification)\b)',
+        r'(?s)(?:Skills|Core Qualifications)\s*(.*?)(?=\s*(?:\Z|Work History|Work Experience|Summary|Overview|Experience|Education|Training|Certification)\b)',
     )
     match = pattern.search(text)
     if match:
@@ -32,7 +38,7 @@ def get_skills(text):
 def get_experiences(text):
     experience_list = []
     pattern = re.compile(
-        r'(?s)(?:Work History|Experience|Work Experience)\s*(.*?)(?=\s*(?:\Z|Summary|Overview|Skills|Qualifications|Education|Certification|Training)\b)'
+        r'(?s)(?:Work History|Experience|Work Experience)\s*(.*?)(?=\s*(?:\Z|Summary|Overview|Skills|Core Qualifications|Education|Certification|Training)\b)'
     )
     match = pattern.search(text)
     if not match:
@@ -110,14 +116,14 @@ def get_education(text):
     education = []
     
     pattern = re.compile(
-        r'(?s)(?:Education|Academic Background|Training)\s*(.*?)(?=\s*(?:\Z|Work History|Work Experience|Summary|Overview|Experience|Skills|Qualifications|Education|Certifications)\b)'
+        r'(?s)(?:Education|Academic Background|Training)\s*(.*?)(?=\s*(?:\Z|Work History|Work Experience|Summary|Overview|Experience|Skills|Core Qualifications|Education|Certifications)\b)'
     )
     match = pattern.search(text)
     
     entries = get_education_entries(match.group(1)) if match else []
     
     year_pattern = r"\b((?:19|20)\d{2})\b"
-    degree_pattern = r"(\b(?:Bachelor|Master|Associate|Doctorate|Ph\.D|B\.S|M\.S|A\.A|BS|MS|MBA|Certificate|High School Diploma).*?(?=\s*[:,]\s*\d{4}|\s+\b(?:19|20)\d{2}\b|\s+at\s+|\s+\b(?:University|College|School|Institute)\b))"
+    degree_pattern = r"(\b(?:Bachelor|Master|Associate|Doctorate|Ph\.D|B\.S|M\.S|A\.A|BS|MS|MBA|Certificate|High School Diploma).*?(?=\s*[:,]\s*\d{4}|\s+\b(?:19|20)\d{2}\b|[a-z]{3,}\s*\d{4}|\s+at\s+|\s+\b(?:University|College|School|Institute)\b))"
     university_pattern = r"([\w\s,]+(?:University|College|Institute|School|Academy)[\w\s,]*)"
     
     # pattern1 = re.compile(
@@ -156,7 +162,13 @@ def get_education(text):
         if not match_entry:
             continue
         
+        # Clean degree names (prone to errors)
         degree = match_entry.group('degree').strip() if match_entry.group('degree') else "Unknown Degree"
+        for month in month_set:
+            degree = re.sub(f'\\b{month}\\b', '', degree, flags=re.IGNORECASE)
+        degree = re.sub(r'\d+', '', degree)
+        degree = re.sub(r'\s+', ' ', degree).strip()
+        
         university = match_entry.group('university').strip() if match_entry.group('university') else "Unknown University"
         year = match_entry.group('year').strip() if match_entry.group('year') else "Unknown Year"
         
@@ -167,7 +179,6 @@ def get_education(text):
         })
     
     return education if education else None
-
 
 def get_education_entries(text):
     entries = []
