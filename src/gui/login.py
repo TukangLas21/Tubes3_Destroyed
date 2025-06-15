@@ -22,16 +22,23 @@ password_field = create_textfield(
 
 database_field = create_textfield(
     label= "Database",
-    hint_text="Masukkan nama database Anda"
+    hint_text="Masukkan nama database Anda",
+)
+
+key_field = create_textfield(
+    label= "Encyption Key",
+    hint_text="Masukkan encryption key Anda",
+    password=True,
+    can_reveal_password=True
 )
 
 def form_submit_function(e):
     print("Form submitted!")
-    # The text field values will be accessible here because they are in the same scope
     print(f"Host: {host_field.controls[1].value}")
     print(f"Username: {username_field.controls[1].value}")
     print(f"Password: {password_field.controls[1].value}")
     print(f"Database: {database_field.controls[1].value}")
+    print(f"Key: {key_field.controls[1].value}")
 
 login_container = ft.Container(
     ft.Column([
@@ -42,8 +49,9 @@ login_container = ft.Container(
             host_field,
             username_field,
             password_field,
-            database_field],
-            spacing=12,
+            database_field,
+            key_field],
+            spacing=8,
         ),
 
         ft.Row(
@@ -55,7 +63,7 @@ login_container = ft.Container(
                 on_click = form_submit_function
             )]
         ),
-    ], horizontal_alignment = 'center', spacing=24),
+    ], horizontal_alignment = 'center', spacing=16),
     width = 510
 )
 def main(page:ft.Page):
@@ -80,12 +88,7 @@ def main(page:ft.Page):
 
     # Page setup
     page.bgcolor = ft.Colors.TRANSPARENT
-    page.decoration = ft.BoxDecoration (
-        image = ft.DecorationImage(
-            src= 'assets/bg.png',
-            fit= ft.ImageFit.COVER
-        )
-    )
+    page.decoration = bg_image
     page.add(login_container)
     page.update()
 ft.app(main)
