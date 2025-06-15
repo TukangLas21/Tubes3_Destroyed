@@ -65,13 +65,25 @@ def fuzzy_search_start(keywords, cv_texts, exact_search_result, percentage=75.0)
     return exact_search_result
 
 # Main function to start the search process
-def start_search(keywords, algorithm, all_cv_info, number_of_results, connector: Connector):
-    keywords_list = {keywords.strip() for keywords in keywords.split(',') if keywords.strip()}
-    if not keywords_list:
+def start_search(keywords, algorithm, number_of_results):
+    keywords_set = {keywords.strip() for keywords in keywords.split(',') if keywords.strip()}
+    if not keywords_set:
+        return None
+    
+    Connector.get_instance().connect()
+    all_cv_info = Connector.get_instance().get_paths_id()
+    Connector.get_instance().close()
+    
+    if not all_cv_info:
+        print("No CV information provided.")
         return None
     
     cv_texts = {}
-    for detail_id, applicant_id, cv_path in all_cv_info:
+    for i in range (len(all_cv_info)):
+        detail_id = all_cv_info[i][0]
+        applicant_id = all_cv_info[i][1]
+        cv_path = all_cv_info[i][2]
+        
         try:
             text = extract_text_strmatching(cv_path)
             if not text:
@@ -86,11 +98,11 @@ def start_search(keywords, algorithm, all_cv_info, number_of_results, connector:
             continue
             
     exact_start = time.time()
-    search_result, keywords_found = exact_search(keywords_list, cv_texts, algorithm)
+    search_result, keywords_found = exact_search(keywords_set, cv_texts, algorithm)
     exact_end = time.time()
     exact_time = exact_end - exact_start
     
-    keywords_not_found = keywords_list - keywords_found
+    keywords_not_found = keywords_set - keywords_found
     
     fuzzy_start = fuzzy_end = 0
     if keywords_not_found:
@@ -108,7 +120,7 @@ def start_search(keywords, algorithm, all_cv_info, number_of_results, connector:
     sorted_results = final_results[:number_of_results]
     
     try:
-        connector.connect()
+        Connector.get_instance().connect()
     except Exception as e:
         print(f"Error connecting to database: {e}")
         return None 
@@ -116,20 +128,20 @@ def start_search(keywords, algorithm, all_cv_info, number_of_results, connector:
     # Get applicant profiles for the results
     for result in sorted_results:
         applicant_id = result['applicant_id']
-        profile = connector.get_decrypted_profile(applicant_id)
+        profile = Connector.get_instance().get_decrypted_profile(applicant_id)
         result['profile'] = profile if profile else {
             "first_name": "Unknown",
             "last_name": "Unknown",
             "address": "Unknown",
             "phone_number": "Unknown"
         }
-    connector.close()
+    Connector.get_instance().close()
     
-    return {
-        "results": sorted_results,
-        "exact_time": exact_time,
-        "fuzzy_time": fuzzy_end - fuzzy_start if keywords_not_found else 0     
-    }
+    print(f"Found {len(sorted_results)} results")
+    print(f"Search completed in {exact_time:.2f} seconds for exact search.")
+    
+    
+    return sorted_results, exact_time, fuzzy_end - fuzzy_start if keywords_not_found else 0
 
 def get_cv_text(cv_path):
     text = extract_text_regex(cv_path)

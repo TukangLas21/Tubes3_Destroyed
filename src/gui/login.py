@@ -1,5 +1,10 @@
 import flet as ft
+import os
+import sys
 from styles import *
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from connector import Connector
+from test_connector import test_connector
 
 # Text Fields
 
@@ -40,6 +45,18 @@ def form_submit_function(e):
     print(f"Database: {database_field.controls[1].value}")
     print(f"Key: {key_field.controls[1].value}")
 
+    connector = test_connector(
+        host=host_field.controls[1].value,
+        user=username_field.controls[1].value,
+        password=password_field.controls[1].value,
+        database=database_field.controls[1].value,
+        encryption_key=key_field.controls[1].value
+        )
+    
+    if connector is None:
+        print("Connection failed. Please check your credentials.")
+        return
+    
     page = e.page
     page.go("/beranda")
 

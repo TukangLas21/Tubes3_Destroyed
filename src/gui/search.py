@@ -1,5 +1,10 @@
 import flet as ft
+import os
+import sys
 from styles import *
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from connector import Connector
+from app import *
 
 ''' SEARCH  '''
 # Input Fields
@@ -29,7 +34,7 @@ algoritma_option = ft.Column(
             segments = [
                 ft.Segment(value="KMP", label=ft.Text("KMP", width=100, style=BODY1_PRIMARY_STYLE, text_align = 'center')),
                 ft.Segment(value="BM", label=ft.Text("BM", width=100, style=BODY1_PRIMARY_STYLE, text_align = 'center')),
-                ft.Segment(value="Aho-Cor", label=ft.Text("Aho-Cor", width=100, style=BODY1_PRIMARY_STYLE, text_align = 'center')),
+                ft.Segment(value="AC", label=ft.Text("Aho-Cor", width=100, style=BODY1_PRIMARY_STYLE, text_align = 'center')),
             ]
         )
     ]
@@ -37,10 +42,53 @@ algoritma_option = ft.Column(
 
 # Sesuaikan fungsinya mas backend
 def search_submit_function(e):
+    page = e.page
+    
     print("Search submitted!")
+    keywords = keyword_field.controls[1].value
     print(f"Kata Kunci: {keyword_field.controls[1].value}")
+    top_matches = top_matches_field.controls[1].value
     print(f"Jumlah Top Matches: {top_matches_field.controls[1].value}")
+    algoritma = algoritma_option.controls[1].selected
     print(f"Algoritma: {algoritma_option.controls[1].selected}")
+    
+    if not keyword_field.controls[1].value or not top_matches_field.controls[1].value:
+        print("Please fill in all fields.")
+        return
+    
+    page.splash = ft.ProgressBar()
+    page.update()
+    
+    results, exact_search_result, fuzzy_search_result = start_search(
+        keywords=keywords,
+        algorithm=algoritma,
+        number_of_results=int(top_matches)
+    )
+    
+    status_text_exact.value = f"Exact Match: {len(results)} CV ditemukan dalam {exact_search_result:.4f} detik."
+    if fuzzy_search_result == 0:
+        status_text_fuzzy.value = "Fuzzy Match tidak dijalankan."
+    else:
+        status_text_fuzzy.value = f"Fuzzy Match dijalankan dalam {fuzzy_search_result:.4f} detik."
+    
+    cards_area.controls.clear()
+    
+    top_results = results[:int(top_matches)]
+    if not top_results:
+        cards_area.controls.append(ft.Text("Tidak ada hasil yang ditemukan.", style=BODY1_SECONDARY_STYLE))
+    else:
+        row_of_cards = ft.Row(spacing=16, alignment=ft.MainAxisAlignment.CENTER)
+        for i, res in enumerate(top_results):
+            if i > 0 and i % 3 == 0:
+                cards_area.controls.append(row_of_cards)
+                row_of_cards = ft.Row(spacing=16, alignment=ft.MainAxisAlignment.CENTER)
+            row_of_cards.controls.append(create_result_card(res))
+        cards_area.controls.append(row_of_cards)
+        
+    result_container.visible = True
+    page.splash = None
+    page.update()   
+    
 
 # Search Containernya
 search_container = ft.Container(
@@ -72,111 +120,78 @@ search_container = ft.Container(
 
 ''' RESULT  '''
 def summary_function(e):
+    detail_id = e.control.data['detail_id']
+    applicant_id = e.control.data['applicant_id']
+    cv_path = e.control.data['cv_path']
     page = e.page
     page.go("/summary")
 
 def cv_function(e):
+    cv_path = e.control.data['cv_path']
     page = e.page
     page.go("/cv")
 
 # Result cards
-def create_result_card(name: str, matches: int,):
-    return ft.Container(
-    ft.Column([
-        # Bagian atas
-        ft.Column([
-            # Judul dan Matches
+def create_result_card(result_data: dict):
+    keywords_column = ft.Column(spacing=2, scroll=ft.ScrollMode.HIDDEN)
+    keywords_column.controls.append(ft.Text("Matched keywords:", style=BODY2_SECONDARY_STYLE))
+    
+    for keyword, (count, match_type) in result_data['keywords_matches'].items():
+        keywords_column.controls.append(
+            ft.Text(f"{keyword}: {count} occurence{'s' if count > 1 else ''} ({match_type})", 
+                    style=BODY2_SECONDARY_STYLE)
+        )
+        
+    card = ft.Container(
+        content=ft.Column([
             ft.Row([
-                ft.Text(name, style = SH1_STYLE),
-                ft.Text(f"{matches} {'Matches' if (matches > 1) else 'Match'}", 
-                        style = BODY1_SECONDARY_STYLE),
-            ],
-            spacing = 16,
+                ft.Text(result_data['profile']['first_name'] + " " + result_data['profile']['last_name'], style=BODY1_PRIMARY_STYLE),
+                ft.Text(f"{result_data['accuracy_score']} Matches", style=BODY2_SECONDARY_STYLE)
+            ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
+            ft.Container(
+                content=keywords_column, height=100, padding=ft.padding.only(top=5)
             ),
-
-            # Matches keywords
-            ft.Column([
-                ft.Text("Matched keywords:", style = BODY2_SECONDARY_STYLE),
-                ft.Text("React: 1 occurence (ini diappend nanti)", style = BODY2_SECONDARY_STYLE),
-                ft.Text("Express: 1 occurence", style = BODY2_SECONDARY_STYLE),
-                ft.Text("HTML: 1 occurence", style = BODY2_SECONDARY_STYLE),
-                ft.Text("HTML: 1 occurence", style = BODY2_SECONDARY_STYLE),
-                ft.Text("HTML: 1 occurence", style = BODY2_SECONDARY_STYLE),
-            ],
-            spacing = 0,
-            height = 100,
-            scroll = ft.ScrollMode.HIDDEN, # scroll jika keywordnya banyak
-            )
-        ],
-        # Pengaturan Column
-        spacing = 12,
-        ),
-
-        # Bagian Bawah
-        ft.Row([
-            ft.FilledButton(
-                content = ft.Text("Summary", style = BODY1_PRIMARY_STYLE),
-                style = BUTTON_S,
-                on_click = summary_function
-            ),
-            ft.FilledButton(
-                content = ft.Text("Lihat CV", style = BODY1_PRIMARY_STYLE),
-                style = BUTTON_S,
-                on_click = cv_function
-            ),
-        ],
-        expand = True,
-        ),
-
-    ],
-    # Pengaturan Column
-    spacing = 44,
-    width = 230,
-    ),
-    # Pengaturan column container (glass style)
-    bgcolor = APP_COLORS["glass"],
-    padding = ft.padding.symmetric(horizontal = 32, vertical = 32),
-    border_radius = 24, border = ft.border.all(width = 1, color = APP_COLORS["white-transparent"])
-)
+            ft.Row([
+                ft.FilledButton(
+                    content=ft.Text("Summary", style=BODY1_PRIMARY_STYLE),
+                    style=BUTTON_S,
+                    on_click=summary_function
+                ),
+                ft.FilledButton(
+                    content=ft.Text("Lihat CV", style=BODY1_PRIMARY_STYLE),
+                    style=BUTTON_S,
+                    on_click=cv_function
+                ),
+            ]),
+        ]),
+        bgcolor=APP_COLORS["glass"],
+        padding=ft.padding.symmetric(horizontal=32, vertical=32),
+        border_radius=24, 
+        border=ft.border.all(width=1, color=APP_COLORS["white-transparent"])
+    )
+    return card
 
 # Result Container
+status_text_exact = ft.Text("Menunggu pencarian...", style=BODY1_SECONDARY_STYLE)
+status_text_fuzzy = ft.Text("", style=BODY1_SECONDARY_STYLE)
+cards_area = ft.Column(
+    wrap=True,
+    run_spacing=16,
+    spacing=16,
+    alignment=ft.MainAxisAlignment.CENTER
+)
+
 result_container = ft.Container(
     ft.Column([
-        # Title
-        ft.Column([
-            ft.Text("Hasil Pencarian", style = HEADING_STYLE),
-            ft.Text("Exact Match: 100 CVs di-scan dalam 100 ms.", style = BODY1_SECONDARY_STYLE),
-            ft.Text("Fuzzy Match: 100 CVs di-scan dalam 100 ms.", style = BODY1_SECONDARY_STYLE)
-        ],
-        spacing = 0,
-        horizontal_alignment = ft.CrossAxisAlignment.CENTER,
-        ),
-
-        # Result Cards, 3 cards per row
-        ft.Column([
-            # 1st Row of Cards
-            ft.Row([
-                create_result_card(name="Lucas", matches=4),
-                create_result_card(name="Nicoa", matches=1),
-                create_result_card(name="Lucas", matches=4),
-            ],
-            spacing = 16),
-
-            # 2nd Row of Cards
-            ft.Row([
-                create_result_card(name="Lucas", matches=4),
-                create_result_card(name="Nicoa", matches=1),
-                create_result_card(name="Lucas", matches=4),
-            ],
-            spacing = 16),
-        ],
-        spacing = 16)
-
-    ],
-    spacing = 24,
-    horizontal_alignment = ft.CrossAxisAlignment.CENTER,
+        ft.Text("Hasil Pencarian", style=HEADING_STYLE),
+        status_text_exact,
+        status_text_fuzzy,
+    ],spacing = 24,
+    horizontal_alignment = ft.CrossAxisAlignment.CENTER, 
     ),
-    alignment = ft.alignment.top_center, expand = True
+    alignment=ft.alignment.top_center,
+    expand=True,
+    visible=False,  # Initially hidden
 )
 
 ''' SEARCH + RESULT (Result di bawah Search) '''

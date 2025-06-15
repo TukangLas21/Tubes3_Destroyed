@@ -7,18 +7,18 @@ def test_connector(host, user, password, database, encryption_key=None):
     connector = Connector(host, user, password, database, encryption_key)
     
     # Test connection
-    connector.connect()
+    Connector.get_instance().connect()
     if connector.connection is None:
         raise Exception("Connection failed")
     
     # Test fetching applicant profile
     detail_id = 1  
-    profile = connector.get_applicant_profile(detail_id)
+    profile = Connector.get_instance().get_decrypted_profile(detail_id)
     if profile is None:
         raise Exception("Failed to fetch applicant profile")
     
     # Test closing connection
-    connector.close()
+    Connector.get_instance().close()
     if connector.connection is not None and connector.connection.is_connected():
         raise Exception("Connection was not closed properly")
     

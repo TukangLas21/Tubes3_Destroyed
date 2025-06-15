@@ -1,20 +1,50 @@
 import mysql.connector
-import os
 from encryption import Encryption  
 
-SRC_DIR = os.path.dirname(os.path.abspath(__file__))
-ROOT_DIR = os.path.dirname(SRC_DIR)
-SQL_PATH = "data/applicant_data.sql"
-
 class Connector:
-    def __init__(self, host, user, password, database, encryption_key=None):
-        self.host = host
-        self.user = user
-        self.password = password
-        self.database = database
-        self.connection = None
-        self.cursor = None
-        self.encryption = Encryption(encryption_key) if encryption_key else None
+    _instance = None
+    _initialized = False
+    
+    def __new__(cls, host=None, user=None, password=None, database=None, encryption_key=None):
+        if cls._instance is None:
+            cls._instance = super(Connector, cls).__new__(cls)
+        return cls._instance
+    
+    def __init__(self, host=None, user=None, password=None, database=None, encryption_key=None):
+        # Only initialize once
+        if not self._initialized:
+            if not all([host, user, password, database]):
+                raise ValueError("All connection parameters (host, user, password, database) must be provided for first initialization")
+            
+            self.host = host
+            self.user = user
+            self.password = password
+            self.database = database
+            self.connection = None
+            self.cursor = None
+            self.encryption = Encryption(encryption_key) if encryption_key else None
+            self._initialized = True
+        else:
+            # If already initialized, optionally update encryption key if provided
+            if encryption_key is not None:
+                self.encryption = Encryption(encryption_key)
+        
+    @classmethod
+    def get_instance(cls):
+        if cls._instance is None:
+            raise RuntimeError("Connector instance not created yet. Use Connector(host, user, password, database) first.")
+        return cls._instance
+    
+    @classmethod
+    def is_initialized(cls):
+        return cls._instance is not None and cls._instance._initialized
+    
+    @classmethod
+    def reset_instance(cls):
+        if cls._instance:
+            cls._instance.close()
+        cls._instance = None
+        cls._initialized = False
         
     def connect(self):
         if self.connection and self.connection.is_connected():
@@ -56,38 +86,6 @@ class Connector:
             self.connection.close() if self.connection else None
             self.cursor.close() if self.cursor else None
             
-    # Create database if not exists and set up the data
-    def ensure_database_exists(self):
-        if not self.connection or not self.connection.is_connected():
-            print("No active connection")
-            return False
-        try:
-            self.cursor.execute(f"CREATE DATABASE IF NOT EXISTS {self.database}")
-            self.cursor.execute(f"USE {self.database}")
-            
-            sql_file_path = os.path.join(ROOT_DIR, SQL_PATH)
-            
-            with open(sql_file_path, 'r', encoding='utf-8') as file:
-                print(f"Executing SQL commands from {sql_file_path}")
-                sql_commands = file.read().split(';')
-                
-            # Execute each command in the SQL file
-            for command in sql_commands:
-                if command.strip():
-                    try:
-                        self.cursor.execute(command)
-                    except mysql.connector.Error as err:
-                        print(f"Error executing command: {err}")
-                            
-            self.connection.commit()
-            print("Database ensured and SQL commands executed")
-            
-            return True
-        
-        except mysql.connector.Error as err:
-            print(f"Error in ensuring database: {err}")
-            return False
-
     def close(self):
         if self.cursor:
             self.cursor.close()
@@ -166,7 +164,7 @@ class Connector:
             applicants = self.cursor.fetchall()
             
             if not applicants:
-                print("No applicants found to encrypt")
+                print("No applicants found to decrypt")
                 return False
             
             print(f"Decrypting data for {len(applicants)} applicants")
@@ -231,3 +229,26 @@ class Connector:
         except Exception as e:
             print(f"Unexpected error: {e}")
             return None
+
+
+# Example usage:
+if __name__ == "__main__":
+    # First initialization - creates the singleton instance
+    db1 = Connector("localhost", "root", "password", "mydb", "encryption_key")
+    
+    # Subsequent calls return the same instance
+    db2 = Connector()  # Parameters are ignored since instance already exists
+    
+    # Both variables reference the same instance
+    print(db1 is db2)  # True
+    
+    # Alternative way to get the instance
+    db3 = Connector.get_instance()
+    print(db1 is db3)  # True
+    
+    # Connect and use the database
+    db1.connect()
+    
+    # Reset instance if needed (for testing or changing connection parameters)
+    # Connector.reset_instance()
+    # new_db = Connector("new_host", "new_user", "new_pass", "new_db")
