@@ -40,7 +40,7 @@ def extract_text_strmatching(file_path):
         doc.close()
         
         full_text = full_text.replace('\n', ' ')
-        full_text = re.sub(r'\s+', ' ', full_text).strip()
+        full_text = re.sub(r'\s+', ' ', full_text).strip().lower()
 
         return full_text if full_text else None
     except FileNotFoundError:

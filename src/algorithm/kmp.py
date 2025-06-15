@@ -1,3 +1,5 @@
+# from pdf_processor import extract_text_strmatching
+
 def compute_lps(pattern):
     m = len(pattern)
     lps = [0] * m
@@ -47,21 +49,29 @@ def KMP(text, pattern):
     
     return count
 
-if __name__ == "__main__":
-    text = "ABABCABABA"
-    pattern = "ABA"
+# if __name__ == "__main__":
+#     path = "data/BANKING/3547447.pdf"
+#     text = extract_text_strmatching(path)
+#     pattern = "banking"
     
-    result = KMP(text, pattern)
-    print(f"Pattern '{pattern}' found {result} times in text '{text}'")
+#     print(f"Extracted text: {text}")  # Print first 100 characters for brevity
     
-    # Test with overlapping patterns
-    text2 = "AAAAAAA"
-    pattern2 = "AAA"
-    result2 = KMP(text2, pattern2)
-    print(f"Pattern '{pattern2}' found {result2} times in text '{text2}'")
+#     result = KMP(text, pattern)
+#     print(f"Pattern '{pattern}' found {result} times in text from '{path}'")
+    # text = "ABABCABABA"
+    # pattern = "ABA"
     
-    # Test with no matches
-    text3 = "ABCDEF"
-    pattern3 = "XYZ"
-    result3 = KMP(text3, pattern3)
-    print(f"Pattern '{pattern3}' found {result3} times in text '{text3}'")
+    # result = KMP(text, pattern)
+    # print(f"Pattern '{pattern}' found {result} times in text '{text}'")
+    
+    # # Test with overlapping patterns
+    # text2 = "AAAAAAA"
+    # pattern2 = "AAA"
+    # result2 = KMP(text2, pattern2)
+    # print(f"Pattern '{pattern2}' found {result2} times in text '{text2}'")
+    
+    # # Test with no matches
+    # text3 = "ABCDEF"
+    # pattern3 = "XYZ"
+    # result3 = KMP(text3, pattern3)
+    # print(f"Pattern '{pattern3}' found {result3} times in text '{text3}'")

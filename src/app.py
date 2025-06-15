@@ -8,6 +8,7 @@ from algorithm.fuzzy import fuzzy_search
 from algorithm.bm import BoyerMoore
 from algorithm.ac import AhoCorasick
 from algorithm.kmp import KMP
+from collections import Counter
 
 def exact_search(keywords, cv_texts, algorithm):
     search_result = {
@@ -20,23 +21,32 @@ def exact_search(keywords, cv_texts, algorithm):
     }
     keywords_found = set()
     
+    if algorithm == "AC":
+        keywords_list = list(keywords)
+        ac = AhoCorasick(keywords_list)
+    
     for detail_id, cv_data in cv_texts.items():
         text = cv_data['text']
-        for keyword in keywords:
-            num_matches = 0
-            if algorithm == "KMP":
-                num_matches = KMP(text, keyword)
-            elif algorithm == "BM":
-                num_matches = BoyerMoore(text, keyword)
-            elif algorithm == "AC":
-                ac = AhoCorasick([keyword])
-                num_matches = ac.search(text)
-            else:
-                raise ValueError(f"Unknown algorithm: {algorithm}")
-            
-            if num_matches > 0:
-                search_result[detail_id]["keywords_matches"][keyword] = [num_matches, "exact"]
-                keywords_found.add(keyword)
+        
+        if algorithm == "AC":
+            found_patterns = ac.search_detailed(text)
+            if found_patterns:
+                keywords_count = Counter(item['val'] for item in found_patterns)
+                for keyword, count in keywords_count.items():
+                    search_result[detail_id]["keywords_matches"][keyword] = [count, "exact"]
+                    keywords_found.add(keyword)
+                    
+        else:
+            for keyword in keywords:
+                num_matches = 0
+                if algorithm == "KMP":
+                    num_matches = KMP(text, keyword)
+                elif algorithm == "BM":
+                    num_matches = BoyerMoore(text, keyword)
+                
+                if num_matches > 0:
+                    search_result[detail_id]["keywords_matches"][keyword] = [num_matches, "exact"]
+                    keywords_found.add(keyword)
             
     return search_result, keywords_found
 

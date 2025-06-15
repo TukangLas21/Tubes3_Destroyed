@@ -1,4 +1,5 @@
 # Boyer-Moore (BM) Algorithm for Pattern Matching
+# from pdf_processor import extract_text_strmatching
 def badCharacterRule(pattern):
     occurrenceMap = {}
     m = len(pattern)
@@ -63,15 +64,23 @@ def BoyerMoore(text, pattern):
     return count
 
 # Example usage
-if __name__ == "__main__":
-    text = "ABAAABCDABABCABCABCDAB"
-    pattern = "ABC"
+# if __name__ == "__main__":
+#     path = "data/BANKING/3547447.pdf"
+#     text = extract_text_strmatching(path)
+#     pattern = "banking"
     
-    result = BoyerMoore(text, pattern)
-    print(f"Pattern '{pattern}' found {result} times in text '{text}'")
+#     print(f"Extracted text: {text}")  # Print first 100 characters for brevity
     
-    # Test with overlapping patterns
-    text2 = "AAAAAAA"
-    pattern2 = "AAA"
-    result2 = BoyerMoore(text2, pattern2)
-    print(f"Pattern '{pattern2}' found {result2} times in text '{text2}'")
+#     result = BoyerMoore(text, pattern)
+#     print(f"Pattern '{pattern}' found {result} times in text from '{path}'")
+    # text = "ABAAABCDABABCABCABCDAB"
+    # pattern = "ABC"
+    
+    # result = BoyerMoore(text, pattern)
+    # print(f"Pattern '{pattern}' found {result} times in text '{text}'")
+    
+    # # Test with overlapping patterns
+    # text2 = "AAAAAAA"
+    # pattern2 = "AAA"
+    # result2 = BoyerMoore(text2, pattern2)
+    # print(f"Pattern '{pattern2}' found {result2} times in text '{text2}'")

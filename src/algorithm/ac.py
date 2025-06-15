@@ -113,6 +113,9 @@ class AhoCorasick:
 
 # Example usage
 # if __name__ == "__main__":
+#     patterns = ["banking"]
+    
+    
 #     # Test with multiple patterns
 #     patterns = ["he", "she", "his", "hers"]
 #     text = "ushers"
