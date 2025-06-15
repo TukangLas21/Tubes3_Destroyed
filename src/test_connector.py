@@ -3,8 +3,8 @@ from connector import Connector
 """
 Test script for Connector class, integrate this later
 """
-def test_connector(host, user, password, database):
-    connector = Connector(host, user, password, database)
+def test_connector(host, user, password, database, encryption_key=None):
+    connector = Connector(host, user, password, database, encryption_key)
     
     # Test connection
     connector.connect()
