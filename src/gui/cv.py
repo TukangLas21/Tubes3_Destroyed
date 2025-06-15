@@ -1,10 +1,9 @@
 import flet as ft
 from styles import *
 
-# nanti ganti ya mas BE
 def back_function(e):
     page = e.page
-    page.on_view_pop
+    page.go("/search")
 
 cv_content = ft.Container(
     ft.Column([

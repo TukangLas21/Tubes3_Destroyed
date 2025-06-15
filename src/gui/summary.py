@@ -1,10 +1,9 @@
 import flet as ft
 from styles import *
 
-# nanti ganti ya mas BE
 def back_function(e):
     page = e.page
-    page.on_view_pop
+    page.go("/search")
 
 summary_content = ft.Container(
     ft.Column([
@@ -90,6 +89,6 @@ alignment = ft.alignment.top_center, expand = True,
 #     page.bgcolor = ft.Colors.TRANSPARENT
 #     page.decoration = bg_image
 #     page.appbar = navbar
-#     page.add(summary_content)
+#     page.add(summary_menu(page))
 #     page.update()
 # ft.app(main)
