@@ -12,7 +12,7 @@ summary_content = ft.Container(
             ft.Row([
                 ft.Icon(ft.Icons.ARROW_BACK, color=APP_COLORS["white"]),
                 ft.Text(
-                    "Menunjukkan Summary: Lucas", # jangan lupa ganti ini sesuai pemilik CV
+                    "Menunjukkan CV: Lucas", # jangan lupa ganti ini sesuai pemilik CV
                     style = HEADING_STYLE,
                     text_align = ft.TextAlign.CENTER
                 ),
