@@ -65,7 +65,7 @@ def get_experiences(text):
             continue
         
         # Extract job title, company name, and date
-        job_title = re.search(r'(?i)(?:(?:(?:|\d{4}|\d{1,2}\/\d{4}|[a-z]{3,}\s\d{4})to\s*(?:current|\d{4}|\d{1,2}\/\d{4}|[a-z]{3,}\s\d{4}))|(?:\s*Company Name\s*,*\s*City\s*,*\s*State\s*))?\s*(.*?)\s*(?:(?:[a-z]{3,}\s\d{4}|\d{1,2}\/\d{4})\s+to()|Company Name)', entry)
+        job_title = re.search(r'(?i)(?:(?:(?:|\d{4}|\d{1,2}\/\d{4}|[a-z]{3,}\s\d{4})to\s*(?:current|\d{4}|\d{1,2}\/\d{4}|[a-z]{3,}\s\d{4}))|(?:\s*Company Name\s*,*\s*City\s*,*\s*State\s*))?\s*(.*?)\s*(?:(?:[a-z]{3,}\s\d{4}|\d{1,2}\/\d{4})\s+to|Company Name)', entry)
         company_name = "Company Name"
         if job_title:
             job_title = job_title.group(1).strip()
